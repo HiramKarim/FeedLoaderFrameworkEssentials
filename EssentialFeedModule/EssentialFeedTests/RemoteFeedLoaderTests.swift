@@ -6,25 +6,7 @@
 //
 
 import XCTest
-
-class RemoteFeedLoader {
-    let client: HTTPClient
-    let url: URL
-    
-    init(url: URL, client: HTTPClient) {
-        self.url = url
-        self.client = client
-    }
-    
-    func load() {
-        self.client.get(from: self.url)
-    }
-}
-
-protocol HTTPClient {
-    var requestedURL: URL? { get set }
-    func get(from url: URL)
-}
+@testable import EssentialFeedModule ///makes the internal types visible to the test target
 
 final class RemoteFeedLoaderTests: XCTestCase {
 
@@ -43,7 +25,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
         ///When
         
         ///Then
-        XCTAssertNil(client.requestedURL)
+        XCTAssertEqual(client.requestedURLs, [])
     }
     
     func test_load_requestDatafromURL() {
@@ -55,7 +37,20 @@ final class RemoteFeedLoaderTests: XCTestCase {
         sut.load()
         
         ///Then
-        XCTAssertNotNil(client.requestedURL)
+        XCTAssertEqual(client.requestedURLs, [url])
+    }
+    
+    func test_loadTwice_requestDatafromURL() {
+        ///Given
+        let url = URL(string: "https://a-url.com")!
+        let (sut , client) = makeSUTandClientHTTP(url: url)
+        
+        ///When
+        sut.load()
+        sut.load()
+        
+        ///Then
+        XCTAssertEqual(client.requestedURLs, [url, url])
     }
     
     //MARK: - HELPERS
@@ -69,9 +64,10 @@ final class RemoteFeedLoaderTests: XCTestCase {
     }
     
     class HTTPCLientSpy: HTTPClient {
-        var requestedURL: URL?
+        var requestedURLs = [URL]()
+        
         func get(from url: URL) {
-            requestedURL = url
+            requestedURLs.append(url)
         }
     }
 
