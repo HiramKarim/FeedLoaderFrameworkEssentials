@@ -59,7 +59,10 @@ final class RemoteFeedLoaderTests: XCTestCase {
     }
     
     //MARK: - HELPERS
-    private func makeSUTandClientHTTP(url: URL = URL(string: "https://a-url.com")!) -> (sut: RemoteFeedLoader, client: HTTPCLientSpy) {
+    private func makeSUTandClientHTTP(
+        url: URL = URL(string: "https://a-url.com")!
+    ) -> (sut: RemoteFeedLoader,
+        client: HTTPCLientSpy) {
         let client = HTTPCLientSpy()
         let sut = RemoteFeedLoader(url: url, client: client)
         return (sut, client)
