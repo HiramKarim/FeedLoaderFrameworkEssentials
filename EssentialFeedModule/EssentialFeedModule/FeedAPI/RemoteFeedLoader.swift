@@ -11,7 +11,7 @@ import Foundation
 ///The 'public' access control makes visible for external modules
 
 public enum HTTPCLientResult {
-    case success(HTTPURLResponse)
+    case success(Data, HTTPURLResponse)
     case failure(Error)
 }
 
