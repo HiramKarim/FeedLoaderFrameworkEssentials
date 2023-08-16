@@ -139,10 +139,18 @@
 		1F8AD2BD2A82B091008DC04B /* EssentialFeedTests */ = {
 			isa = PBXGroup;
 			children = (
+				1F97573A2A8D51080075FD32 /* Feed API */,
 				1F8AD2BE2A82B091008DC04B /* EssentialFeedTests.swift */,
-				1F85DC8D2A83FC7900BD0DA8 /* RemoteFeedLoaderTests.swift */,
 			);
 			path = EssentialFeedTests;
+			sourceTree = "<group>";
+		};
+		1F97573A2A8D51080075FD32 /* Feed API */ = {
+			isa = PBXGroup;
+			children = (
+				1F85DC8D2A83FC7900BD0DA8 /* RemoteFeedLoaderTests.swift */,
+			);
+			path = "Feed API";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
