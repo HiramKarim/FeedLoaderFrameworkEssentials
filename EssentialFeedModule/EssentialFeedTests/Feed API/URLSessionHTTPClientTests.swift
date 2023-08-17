@@ -7,6 +7,7 @@
 
 import Foundation
 import XCTest
+import EssentialFeedModule
 
 class URLSessionHTTPClient {
     private let session: URLSession
@@ -15,22 +16,16 @@ class URLSessionHTTPClient {
         self.session = session
     }
     
-    func get(from url: URL) {
-        session.dataTask(with: url) { _, _, _ in }.resume()
+    func get(from url: URL, completion: @escaping (HTTPCLientResult) -> Void) {
+        session.dataTask(with: url) { _, _, error in
+            if let error = error {
+                completion(.failure(error))
+            }
+        }.resume()
     }
 }
 
 class URLSessionHTTPClientTests: XCTestCase {
-    
-    func test_getFromURL_createsDataTaskWithURL() {
-        let url = URL(string: "http://any-url.com")!
-        let session = URLSessionSpy() ///Mock
-        let sut = URLSessionHTTPClient(session: session)
-        
-        sut.get(from: url)
-        
-        XCTAssertEqual(session.receivedURLs, [url])
-    }
     
     func test_getFromURL_resumesDataTaskWithURL() {
         let url = URL(string: "http://any-url.com")!
@@ -40,16 +35,40 @@ class URLSessionHTTPClientTests: XCTestCase {
         
         let sut = URLSessionHTTPClient(session: session)
         
-        sut.get(from: url)
+        sut.get(from: url) { _ in }
         
         XCTAssertEqual(task.resumeCallCount, 1)
+    }
+    
+    func test_getFromURL_failsOnRequestError() {
+        let url = URL(string: "http://any-url.com")!
+        let session = URLSessionSpy() ///Mock
+        let task = URLSessionDataTaskSpy() ///Mock
+        let error = NSError(domain: "any error", code: 1)
+        session.stub(url: url, task: task)
+        
+        let sut = URLSessionHTTPClient(session: session)
+        
+        let exp = expectation(description: "wait for completion")
+        
+        sut.get(from: url) { result in
+            switch result {
+            case let .failure(receivedError as NSError):
+                XCTAssertEqual(receivedError, error)
+            default:
+                XCTFail("Expected failure with error \(error), got \(result) instead")
+            }
+            
+            exp.fulfill()
+        }
+        
+        wait(for: [exp])
     }
     
 }
 
 //MARK: - HELPERS
 private class URLSessionSpy: URLSession {
-    var receivedURLs = [URL]()
     private var stubs = [URL: URLSessionDataTask]()
     
     func stub(url: URL, task: URLSessionDataTask) {
@@ -57,7 +76,6 @@ private class URLSessionSpy: URLSession {
     }
     
     override func dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        receivedURLs.append(url)
         return stubs[url] ?? FakeURLSessionDataTask()
     }
 }
