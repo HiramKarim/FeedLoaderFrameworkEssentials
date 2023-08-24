@@ -47,7 +47,7 @@ class URLSessionHTTPClientTests: XCTestCase {
             exp.fulfill()
         }
         
-        URLSessionHTTPClient().get(from: url) { _ in }
+        makeSUT().get(from: url) { _ in }
         
         wait(for: [exp])
     }
@@ -62,7 +62,7 @@ class URLSessionHTTPClientTests: XCTestCase {
         
         let exp = expectation(description: "wait for completion")
         
-        sut.get(from: url) { result in
+        makeSUT().get(from: url) { result in
             switch result {
             case let .failure(receivedError as NSError):
                 XCTAssertEqual(receivedError.code, error.code)
@@ -76,9 +76,23 @@ class URLSessionHTTPClientTests: XCTestCase {
         wait(for: [exp])
     }
     
+    //MARK: - HELPERS
+
+    private func trackForMemoryLeaks(_ instance: AnyObject,
+                                     file: StaticString = #file,
+                                     line: UInt = #line) {
+        addTeardownBlock {
+            XCTAssertNil(instance, "Instance should have been deadllocated. Potential memory leak.", file: file, line: line)
+        }
+    }
+
+    private func makeSUT(file: StaticString = #file,
+                         line: UInt = #line) -> URLSessionHTTPClient {
+        return URLSessionHTTPClient()
+    }
+    
 }
 
-//MARK: - HELPERS
 private class URLProtocolStub: URLProtocol {
     
     private struct Stub {
