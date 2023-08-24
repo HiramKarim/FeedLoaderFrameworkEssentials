@@ -143,14 +143,6 @@ final class RemoteFeedLoaderTests: XCTestCase {
         return .failure(error)
     }
     
-    private func trackForMemoryLeaks(_ instance: AnyObject,
-                                     file: StaticString = #file,
-                                     line: UInt = #line) {
-        addTeardownBlock {
-            XCTAssertNil(instance, "Instance should have been deadllocated. Potential memory leak.", file: file, line: line)
-        }
-    }
-    
     private func expect(_ sut: RemoteFeedLoader,
                         toCompleteWithResult expectedResult: RemoteFeedLoader.Result,
                         when actionCallback: () -> Void,
