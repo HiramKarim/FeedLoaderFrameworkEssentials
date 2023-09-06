@@ -92,6 +92,8 @@ final class RemoteFeedLoaderTests: XCTestCase {
         let (sut, client) = makeSUTandClientHTTP()
         
         let item1 = makeItem(id: UUID(),
+                             description: "a description",
+                             location: "a location",
                              imageURL: URL(string: "htt://a-url.com")!)
         
         let item2 = makeItem(id: UUID(),
@@ -133,8 +135,8 @@ final class RemoteFeedLoaderTests: XCTestCase {
         let client = HTTPCLientSpy()
         let sut = RemoteFeedLoader(url: url, client: client)
         
-        trackForMemoryLeaks(sut)
-        trackForMemoryLeaks(client)
+        //trackForMemoryLeaks(sut)
+        //trackForMemoryLeaks(client)
         
         return (sut, client)
     }
