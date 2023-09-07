@@ -10,8 +10,7 @@
   ],
   "defaultOptions" : {
     "testExecutionOrdering" : "random",
-    "testTimeoutsEnabled" : true,
-    "threadSanitizerEnabled" : true
+    "testTimeoutsEnabled" : true
   },
   "testTargets" : [
     {
