@@ -13,7 +13,11 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:../CI.xctestplan">
+            reference = "container:../CI.xctestplan"
+            default = "YES">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:EssentialFeedTests/Feed API/TestPlan.xctestplan">
          </TestPlanReference>
       </TestPlans>
       <Testables>
