@@ -20,10 +20,10 @@ internal final class FeedItemsMapper {
     }
 
     private struct Item: Decodable {
-        public let id: UUID
-        public let description: String?
-        public let location: String?
-        public let imageURL: URL?
+        let id: UUID
+        let description: String?
+        let location: String?
+        let imageURL: URL?
         
         var item: FeedItem {
             return FeedItem(id: id,

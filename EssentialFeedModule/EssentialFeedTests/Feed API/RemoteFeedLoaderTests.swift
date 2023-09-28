@@ -94,12 +94,12 @@ final class RemoteFeedLoaderTests: XCTestCase {
         let item1 = makeItem(id: UUID(),
                              description: "a description",
                              location: "a location",
-                             imageURL: URL(string: "htt://a-url.com")!)
+                             imageURL: URL(string: "https://a-url.com")!)
         
         let item2 = makeItem(id: UUID(),
                              description: "a description",
                              location: "a location",
-                             imageURL: URL(string: "htt://a-url.com")!)
+                             imageURL: URL(string: "https://a-url.com")!)
         
         let items = [item1.model, item2.model]
         
@@ -183,7 +183,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
             "id": item.id.uuidString,
             "description":item.description,
             "location":item.location,
-            "image": item.imageURL?.absoluteString
+            "imageURL": item.imageURL?.absoluteString
         ].reduce(into: [String: Any]()) { (acc, e) in
             if let value = e.value {
                 acc[e.key] = value
