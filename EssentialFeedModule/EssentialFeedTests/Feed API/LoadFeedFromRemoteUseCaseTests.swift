@@ -8,7 +8,7 @@
 import XCTest
 @testable import EssentialFeedModule ///makes the internal types visible to the test target
 
-final class RemoteFeedLoaderTests: XCTestCase {
+final class LoadFeedFromRemoteUseCaseTests: XCTestCase {
     
     func test_init_doesNotRequestDataFromURL() {
         ///Given
