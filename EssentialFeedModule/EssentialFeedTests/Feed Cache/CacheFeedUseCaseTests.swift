@@ -8,46 +8,6 @@
 import XCTest
 import EssentialFeedModule
 
-protocol FeedStore {
-    typealias DeletionCompletion = (Error?) -> Void
-    typealias InsertionCompletion = (Error?) -> Void
-    
-    func insert(_ items: [FeedItem], _ timestamp: Date, completion: @escaping InsertionCompletion)
-    func deleteCachedFeed(completion: @escaping DeletionCompletion)
-}
-
-class LocalFeedLoader {
-    typealias currentDateblock = () -> Date
-    typealias insertionblock = (Error?) -> Void
-    private let store: FeedStore
-    private let currentDate: currentDateblock
-    
-    init(store: FeedStore,
-         currentDate: @escaping currentDateblock) {
-        self.store = store
-        self.currentDate = currentDate
-    }
-    
-    func save(_ items: [FeedItem], completion: @escaping insertionblock) {
-        store.deleteCachedFeed { [weak self] error in
-            guard let self = self else { return }
-            
-            if let cacheDeletionError = error {
-                completion(cacheDeletionError)
-            } else {
-                self.cache(items, with: completion)
-            }
-        }
-    }
-    
-    private func cache(_ items: [FeedItem], with completion: @escaping insertionblock) {
-        store.insert(items, currentDate()) { [weak self] error in
-            guard self != nil else { return }
-            completion(error)
-        }
-    }
-}
-
 final class CacheFeedUseCaseTests: XCTestCase {
     
     private typealias timestampblock = () -> Date
@@ -213,7 +173,7 @@ final class CacheFeedUseCaseTests: XCTestCase {
                         line: UInt = #line) {
         let items = [uniqueItem(), uniqueItem()]
         var receivedError: Error?
-        var exp = expectation(description: "wait for completion")
+        let exp = expectation(description: "wait for completion")
         
         sut.save(items) { error in
             receivedError = error
