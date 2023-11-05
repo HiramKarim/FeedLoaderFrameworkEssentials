@@ -45,12 +45,12 @@ public final class RemoteFeedLoader: FeedLoader {
 }
 
 private extension Array where Element == RemoteFeedItem {
-    func toModels() -> [FeedItem] {
+    func toModels() -> [FeedImage] {
         return map { feedItem in
-            FeedItem(id: feedItem.id,
+            FeedImage(id: feedItem.id,
                      description: feedItem.description,
                      location: feedItem.location,
-                     imageURL: feedItem.imageURL)
+                     url: feedItem.imageURL)
         }
     }
 }
