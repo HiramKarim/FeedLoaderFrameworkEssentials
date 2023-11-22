@@ -7,7 +7,7 @@
 
 import Foundation
 
-public final class FeedCachePolicy {
+internal final class FeedCachePolicy {
 
     private static var maxCacheAgeInDays: Int {
         return 7
