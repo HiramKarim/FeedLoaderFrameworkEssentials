@@ -9,11 +9,11 @@ import Foundation
 
 public final class FeedCachePolicy {
 
-    private var maxCacheAgeInDays: Int {
+    private static var maxCacheAgeInDays: Int {
         return 7
     }
     
-    func validate(_ timestamp: Date, againt date: Date) -> Bool {
+    static func validate(_ timestamp: Date, againt date: Date) -> Bool {
         let calendar = Calendar.current
         guard let maxCacheAge = calendar.date(byAdding: .day, value: maxCacheAgeInDays, to: timestamp)
         else {

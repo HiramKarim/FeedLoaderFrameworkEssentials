@@ -10,7 +10,6 @@ import Foundation
 public final class LocalFeedLoader {
     private let store: FeedStore
     private let currentDate: () -> Date
-    private let cachePolicy = FeedCachePolicy()
     
     public init(store: FeedStore,
                 currentDate: @escaping () -> Date) {
@@ -48,7 +47,7 @@ extension LocalFeedLoader: FeedLoader {
             guard let self = self else { return }
             
             switch result {
-            case let .found(feed, timestamp) where self.cachePolicy.validate(timestamp, againt: self.currentDate()):
+            case let .found(feed, timestamp) where FeedCachePolicy.validate(timestamp, againt: self.currentDate()):
                 completion(.success(feed.toModel()))
             case .found, .empty:
                 completion(.success([]))
@@ -66,7 +65,7 @@ extension LocalFeedLoader {
             switch result {
             case .failure:
                 self.store.deleteCachedFeed { _ in }
-            case let .found(_ , timestamp) where !self.cachePolicy.validate(timestamp, againt: self.currentDate()):
+            case let .found(_ , timestamp) where !FeedCachePolicy.validate(timestamp, againt: self.currentDate()):
                 self.store.deleteCachedFeed { _ in }
             case .empty, .found: break
             }
