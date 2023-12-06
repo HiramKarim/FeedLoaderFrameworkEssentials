@@ -79,7 +79,7 @@ final class CodableFeedStoreTests: XCTestCase {
     }
     
     func test_retrieve_deliversEmptyOnEmptyCache() {
-        let sut = CodableFeedStore()
+        let sut = makeSUT()
         let exp = expectation(description: "wait for retrieval")
         
         sut.retrieve { result in
@@ -95,7 +95,7 @@ final class CodableFeedStoreTests: XCTestCase {
     }
     
     func test_retrieve_hasNoSideEffectsOnEmptyCache_twice() {
-        let sut = CodableFeedStore()
+        let sut = makeSUT()
         let exp = expectation(description: "wait for retrieval")
         
         sut.retrieve { firstResult in
@@ -113,7 +113,7 @@ final class CodableFeedStoreTests: XCTestCase {
     }
     
     func test_retrieveAfterInsertingToEmptyCache_deliversInsertedValues() {
-        let sut = CodableFeedStore()
+        let sut = makeSUT()
         let feed = uniqueImageFeed().local
         let timestamp = Date()
         let exp = expectation(description: "wait for retrieval")
@@ -137,6 +137,11 @@ final class CodableFeedStoreTests: XCTestCase {
     }
     
     //MARK: - HELPERS
+    
+    private func makeSUT() -> CodableFeedStore {
+        return CodableFeedStore()
+    }
+    
     private func removeDiskLocalData() {
         let storeURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!.appending(path: "image-feed.store")
         try? FileManager.default.removeItem(at: storeURL)
