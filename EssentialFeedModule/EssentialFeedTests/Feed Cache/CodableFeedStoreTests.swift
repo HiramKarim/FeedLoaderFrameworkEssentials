@@ -140,16 +140,18 @@ final class CodableFeedStoreTests: XCTestCase {
     
     //MARK: - HELPERS
     
+    func testSpecificStoreURL() -> URL {
+        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appending(path: "\(type(of: self)).store")
+    }
+    
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> CodableFeedStore {
-        let storeURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!.appending(path: "image-feed.store")
-        let sut = CodableFeedStore(storeURL: storeURL)
+        let sut = CodableFeedStore(storeURL: testSpecificStoreURL())
         trackForMemoryLeaks(sut, file: file, line: line)
         return sut
     }
     
     private func removeDiskLocalData() {
-        let storeURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!.appending(path: "image-feed.store")
-        try? FileManager.default.removeItem(at: storeURL)
+        try? FileManager.default.removeItem(at: testSpecificStoreURL())
     }
     
 }
