@@ -4,6 +4,8 @@
 //
 //  Created by Hiram Castro on 11/12/23.
 //
+//  Side Notes:
+//  Global Queue is concurrent. This means, threads run depending of procesor resources availability
 
 import Foundation
 
@@ -40,49 +42,61 @@ public class CodableFeedStore: FeedStore {
     }
     
     private let storeURL: URL
+    /// Background queue - This operation run serially
+    /// This operation uses the shared serial background queue,we are not blocking clients or user interations, still doing the work serially
+    private let  queue = DispatchQueue(label: "\(CodableFeedStore.self)Queue", qos: .userInitiated)
     
     public init(storeURL: URL) {
         self.storeURL = storeURL
     }
     
     public func retrieve(completion: @escaping RetrievalCompletion) {
-        guard let data = try? Data(contentsOf: storeURL) else {
-            return completion(.empty)
-        }
-        
-        do {
-            let decoder = JSONDecoder()
-            let cache = try decoder.decode(Cache.self, from: data)
-            completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
-        } catch let error {
-            completion(.failure(error))
+        let storeURL = self.storeURL
+        queue.async {
+            guard let data = try? Data(contentsOf: storeURL) else {
+                return completion(.empty)
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                let cache = try decoder.decode(Cache.self, from: data)
+                completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+            } catch let error {
+                completion(.failure(error))
+            }
         }
     }
     
     public func insert(_ feed: [LocalFeedImage],
                 _ timestamp: Date,
                 completion: @escaping InsertionCompletion) {
-        do {
-            let encoder = JSONEncoder()
-            let cache = Cache(feed: feed.map(DTOCodableLocalFeedImage.init), timestamp: timestamp)
-            let encoded = try encoder.encode(cache)
-            try encoded.write(to: storeURL)
-            completion(nil)
-        } catch let error {
-            completion(error)
+        let storeURL = self.storeURL
+        queue.async {
+            do {
+                let encoder = JSONEncoder()
+                let cache = Cache(feed: feed.map(DTOCodableLocalFeedImage.init), timestamp: timestamp)
+                let encoded = try encoder.encode(cache)
+                try encoded.write(to: storeURL)
+                completion(nil)
+            } catch let error {
+                completion(error)
+            }
         }
     }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-        guard FileManager.default.fileExists(atPath: storeURL.path()) else {
-            return completion(nil)
-        }
-        
-        do {
-            try FileManager.default.removeItem(at: storeURL)
-            completion(nil)
-        } catch let error {
-            completion(error)
+        let storeURL = self.storeURL
+        queue.async {
+            guard FileManager.default.fileExists(atPath: storeURL.path()) else {
+                return completion(nil)
+            }
+            
+            do {
+                try FileManager.default.removeItem(at: storeURL)
+                completion(nil)
+            } catch let error {
+                completion(error)
+            }
         }
     }
 }
