@@ -44,7 +44,9 @@ public class CodableFeedStore: FeedStore {
     private let storeURL: URL
     /// Background queue - This operation run serially
     /// This operation uses the shared serial background queue,we are not blocking clients or user interations, still doing the work serially
-    private let  queue = DispatchQueue(label: "\(CodableFeedStore.self)Queue", qos: .userInitiated)
+    private let  queue = DispatchQueue(label: "\(CodableFeedStore.self)Queue",
+                                       qos: .userInitiated,
+                                       attributes: .concurrent)
     
     public init(storeURL: URL) {
         self.storeURL = storeURL
@@ -67,11 +69,12 @@ public class CodableFeedStore: FeedStore {
         }
     }
     
+    ///the (flags: .barrier) puts the tak or thread in on-hold until the operation finish - still running serially
     public func insert(_ feed: [LocalFeedImage],
                 _ timestamp: Date,
                 completion: @escaping InsertionCompletion) {
         let storeURL = self.storeURL
-        queue.async {
+        queue.async(flags: .barrier) {
             do {
                 let encoder = JSONEncoder()
                 let cache = Cache(feed: feed.map(DTOCodableLocalFeedImage.init), timestamp: timestamp)
@@ -84,9 +87,10 @@ public class CodableFeedStore: FeedStore {
         }
     }
     
+    ///the (flags: .barrier) puts the tak or thread in on-hold until the operation finish - still running serially
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
         let storeURL = self.storeURL
-        queue.async {
+        queue.async(flags: .barrier) {
             guard FileManager.default.fileExists(atPath: storeURL.path()) else {
                 return completion(nil)
             }
