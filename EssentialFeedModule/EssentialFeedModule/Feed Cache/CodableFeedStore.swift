@@ -6,6 +6,9 @@
 //
 //  Side Notes:
 //  Global Queue is concurrent. This means, threads run depending of procesor resources availability
+//  Serial -> Order
+//  Sync -> blocking clients
+//  Operation Queue's runs serially
 
 import Foundation
 
@@ -44,6 +47,8 @@ public class CodableFeedStore: FeedStore {
     private let storeURL: URL
     /// Background queue - This operation run serially
     /// This operation uses the shared serial background queue,we are not blocking clients or user interations, still doing the work serially
+    /// Serial means order
+    /// side effects are the enemy of concurrency
     private let  queue = DispatchQueue(label: "\(CodableFeedStore.self)Queue",
                                        qos: .userInitiated,
                                        attributes: .concurrent)
@@ -69,7 +74,7 @@ public class CodableFeedStore: FeedStore {
         }
     }
     
-    ///the (flags: .barrier) puts the tak or thread in on-hold until the operation finish - still running serially
+    ///the (flags: .barrier) puts the task or thread on-hold until the operation finish - still running serially
     public func insert(_ feed: [LocalFeedImage],
                 _ timestamp: Date,
                 completion: @escaping InsertionCompletion) {
@@ -87,7 +92,7 @@ public class CodableFeedStore: FeedStore {
         }
     }
     
-    ///the (flags: .barrier) puts the tak or thread in on-hold until the operation finish - still running serially
+    ///the (flags: .barrier) puts the task or thread on-hold until the operation finish - still running serially
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
         let storeURL = self.storeURL
         queue.async(flags: .barrier) {
