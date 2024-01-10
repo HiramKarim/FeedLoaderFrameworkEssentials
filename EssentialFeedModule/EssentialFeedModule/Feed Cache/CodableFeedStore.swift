@@ -97,12 +97,12 @@ public class CodableFeedStore: FeedStore {
         let storeURL = self.storeURL
         queue.async(flags: .barrier) {
             guard FileManager.default.fileExists(atPath: storeURL.path()) else {
-                return completion(nil)
+                return completion(NSError(domain: "invalid url", code: 0))
             }
             
             do {
                 try FileManager.default.removeItem(at: storeURL)
-                completion(nil)
+                completion(NSError(domain: "Deletion Error", code: 0))
             } catch let error {
                 completion(error)
             }
